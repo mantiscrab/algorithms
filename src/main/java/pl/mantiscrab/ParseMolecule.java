@@ -22,7 +22,7 @@ class ParseMolecule {
 
     private Map<String, Integer> parseMolecule() {
         NumberOfAtomsMap atoms = new NumberOfAtomsMap();
-        while (formulaHasCharactersLeft() && parenthesisIsNotClosing()) {
+        while (formulaHasCharactersLeft()) {
             if (parenthesisIsOpening()) {
                 index++;
                 Map<String, Integer> map = parseMolecule();
@@ -34,7 +34,8 @@ class ParseMolecule {
                 atoms.multiply(numberOfAtoms);
                 break;
             }
-            atoms.addAtomOccurrences(parseNextAtoms());
+            Map<String, Integer> parsedAtoms = parseNextAtoms();
+            atoms.addAtomOccurrences(parsedAtoms);
         }
         return atoms.getNumberOfAtoms();
     }
@@ -43,30 +44,34 @@ class ParseMolecule {
         StringBuilder atomNameBuilder = new StringBuilder();
         int atomNumber = 1;
 
-        final Character ch1 = formulaList.get(index);
+        if (formulaHasCharactersLeft()) {
 
-        if (Character.isUpperCase(ch1)) {
-            atomNameBuilder.append(ch1);
-            index++;
-            if (formulaHasCharactersLeft()) {
-                final char ch2 = formulaList.get(index);
-                if (Character.isLowerCase(ch2)) {
-                    atomNameBuilder.append(formulaList.get(index));
-                    index++;
+            final Character ch1 = formulaList.get(index);
+
+            if (Character.isUpperCase(ch1)) {
+                atomNameBuilder.append(ch1);
+                index++;
+                if (formulaHasCharactersLeft()) {
+                    final char ch2 = formulaList.get(index);
+                    if (Character.isLowerCase(ch2)) {
+                        atomNameBuilder.append(formulaList.get(index));
+                        index++;
+                    }
+                    Character ch3 = formulaList.get(index);
+                    if (Character.isDigit(ch3)) {
+                        atomNumber = getNumberOfAtoms();
+                    }
+                    Character ch4 = formulaList.get(index);
+                    if (characterIsClosingParenthesis(ch4)) {
+                        return Map.of(atomNameBuilder.toString(), 1);
+                    }
                 }
-                Character ch3 = formulaList.get(index);
-                if (Character.isDigit(ch3)) {
-                    atomNumber = getNumberOfAtoms();
-                }
-                Character ch4 = formulaList.get(index);
-                if (characterIsClosingParenthesis(ch4)) {
-                    return Map.of(atomNameBuilder.toString(), 1);
-                }
+                String atomName = atomNameBuilder.toString();
+                return Map.of(atomName, atomNumber);
             }
-            String atomName = atomNameBuilder.toString();
-            return Map.of(atomName, atomNumber);
+            throw new RuntimeException();
         }
-        throw new RuntimeException();
+        return Map.of();
     }
 
     private int getNumberOfAtoms() {

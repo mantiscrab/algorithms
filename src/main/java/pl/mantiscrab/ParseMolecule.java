@@ -28,7 +28,7 @@ class ParseMolecule {
 
     private Map<String, Integer> parse() {
         StringBuilder atomNameBuilder = new StringBuilder();
-        final char ch1 = formulaList.get(index);
+        final Character ch1 = formulaList.get(index);
         if (Character.isUpperCase(ch1)) {
             atomNameBuilder.append(ch1);
             index++;
@@ -36,6 +36,7 @@ class ParseMolecule {
                 final char ch2 = formulaList.get(index);
                 if (Character.isLowerCase(ch2)) {
                     atomNameBuilder.append(formulaList.get(index));
+                    index++;
                 }
             }
             String atomName = atomNameBuilder.toString();

@@ -6,23 +6,33 @@ import java.util.List;
 import java.util.Map;
 
 class ParseMolecule {
+    private final NumberOfAtomsMap atoms = new NumberOfAtomsMap();
+    private final String formula;
+    private Integer index = 0;
+
+    public ParseMolecule(String formula) {
+        this.formula = formula;
+    }
 
 
     public static Map<String, Integer> getAtoms(String formula) {
-        NumberOfAtomsMap atoms = new NumberOfAtomsMap();
+        return new ParseMolecule(formula).parseMolecule();
+    }
+
+    private Map<String, Integer> parseMolecule() {
         List<Character> formulaList = stringToCharacterList(formula);
 
-        for (int i = 0; i < formulaList.size(); i++) {
-            int parseUnitFinishBound = getParseUnitFinishBound(formulaList, i);
-            List<Character> parseUnit = formulaList.subList(i, parseUnitFinishBound);
+        for (; index < formulaList.size(); index++) {
+            int parseUnitFinishBound = getParseUnitFinishBound(formulaList);
+            List<Character> parseUnit = formulaList.subList(index, parseUnitFinishBound);
             AtomSymbolAndNumber atom = parse(parseUnit);
             atoms.addAtomOccurrences(atom.getName(), atom.getNumber());
-            i = parseUnitFinishBound - 1;
+            index = parseUnitFinishBound - 1;
         }
         return atoms.getNumberOfAtoms();
     }
 
-    private static int getParseUnitFinishBound(List<Character> formulaList, final int index) {
+    private int getParseUnitFinishBound(List<Character> formulaList) {
         int internalIndex = index;
         MyCharacter character = MyCharacter.of(formulaList.get(index));
         if (character.isAlphabetic())
@@ -38,7 +48,7 @@ class ParseMolecule {
         return internalIndex;
     }
 
-    private static AtomSymbolAndNumber parse(List<Character> formulaList) {
+    private AtomSymbolAndNumber parse(List<Character> formulaList) {
         StringBuilder atomNameBuilder = new StringBuilder();
         int i = 0;
         final char ch1 = formulaList.get(i);
@@ -52,7 +62,6 @@ class ParseMolecule {
             if (Character.isLowerCase(ch2)) {
                 atomNameBuilder.append(formulaList.get(i));
             }
-
         }
         String atomName = atomNameBuilder.toString();
 
@@ -66,12 +75,12 @@ class ParseMolecule {
         return new AtomSymbolAndNumber(atomName, atomNumber);
     }
 
-    private static boolean listHasIndex(List<Character> formulaList, int internalIndex) {
+    private boolean listHasIndex(List<Character> formulaList, int internalIndex) {
         return internalIndex < formulaList.size();
     }
 
 
-    private static List<Character> stringToCharacterList(String formula) {
+    private List<Character> stringToCharacterList(String formula) {
         List<Character> formulaList = formula.chars().mapToObj(c -> (char) c).toList();
         return formulaList;
     }

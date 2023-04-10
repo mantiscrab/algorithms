@@ -19,16 +19,24 @@ class ParseMolecule {
     }
 
     private Map<String, Integer> parseMolecule() {
-        while (formulaHasCharactersLeft()) {
-            Map<String, Integer> parsedAtoms = parse();
-            atoms.addAtomOccurrences(parsedAtoms);
+        NumberOfAtomsMap atoms = new NumberOfAtomsMap();
+        while (formulaHasCharactersLeft() && parenthesisIsNotClosing()) {
+            if (parenthesisIsOpening()) {
+                index++;
+                Map<String, Integer> map = parseMolecule();
+                atoms.addAtomOccurrences(map);
+            }
+            atoms.addAtomOccurrences(parse());
         }
         return atoms.getNumberOfAtoms();
     }
 
     private Map<String, Integer> parse() {
         StringBuilder atomNameBuilder = new StringBuilder();
+        int atomNumber = 1;
+
         final Character ch1 = formulaList.get(index);
+
         if (Character.isUpperCase(ch1)) {
             atomNameBuilder.append(ch1);
             index++;
@@ -38,19 +46,63 @@ class ParseMolecule {
                     atomNameBuilder.append(formulaList.get(index));
                     index++;
                 }
+                Character ch3 = formulaList.get(index);
+                if (Character.isDigit(ch3)) {
+                    atomNumber = getNumberOfAtoms();
+                }
+                if (characterIsClosingParenthesis(formulaList.get(index))) {
+                    index++;
+                    return Map.of(atomNameBuilder.toString(), 1);
+                }
             }
             String atomName = atomNameBuilder.toString();
-
-            StringBuilder atomNumberBuilder = new StringBuilder();
-            while (index < formulaList.size()
-                    && Character.isDigit(formulaList.get(index))) {
-                atomNumberBuilder.append(formulaList.get(index));
-                index++;
-            }
-            final int atomNumber = atomNumberBuilder.toString().equals("") ? 1 : Integer.parseInt(atomNumberBuilder.toString());
             return Map.of(atomName, atomNumber);
         }
         throw new RuntimeException();
+    }
+
+    private int getNumberOfAtoms() {
+        StringBuilder atomNumberBuilder = new StringBuilder();
+        final int atomNumber;
+        while (formulaHasCharactersLeft()
+                && Character.isDigit(formulaList.get(index))) {
+            atomNumberBuilder.append(formulaList.get(index));
+            index++;
+        }
+        atomNumber = atomNumberBuilder.toString().equals("") ? 1 : Integer.parseInt(atomNumberBuilder.toString());
+        return atomNumber;
+    }
+
+    private boolean parenthesisIsOpening() {
+        if (formulaHasCharactersLeft()) {
+            Character character = formulaList.get(index);
+            return characterIsOpeningParenthesis(character);
+        }
+        return false;
+    }
+
+    private static boolean characterIsClosingParenthesis(Character character) {
+        return character.equals(')') || character.equals('}') || character.equals(']');
+    }
+
+    private boolean characterIsOpeningParenthesis(Character character) {
+        return character.equals('(') || character.equals('{') || character.equals('[');
+    }
+
+    private static boolean characterIsNotClosingParenthesis(Character character) {
+        return !characterIsClosingParenthesis(character);
+    }
+
+    private boolean characterIsNotOpeningParenthesis(Character character) {
+        return !characterIsOpeningParenthesis(character);
+    }
+
+    private boolean parenthesisIsNotClosing() {
+        if (formulaHasCharactersLeft()) {
+            Character character = formulaList.get(index);
+            return characterIsNotClosingParenthesis(character);
+        }
+        return false;
     }
 
     private List<Character> stringToCharacterList(String formula) {

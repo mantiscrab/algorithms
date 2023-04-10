@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 
 class ParseMolecule {
+
+    //new method starts from current index and increment in the end
     private final NumberOfAtomsMap atoms = new NumberOfAtomsMap();
     private final List<Character> formulaList;
     private Integer index = 0;
@@ -26,12 +28,18 @@ class ParseMolecule {
                 Map<String, Integer> map = parseMolecule();
                 atoms.addAtomOccurrences(map);
             }
-            atoms.addAtomOccurrences(parse());
+            if (parenthesisIsClosing()) {
+                index++;
+                int numberOfAtoms = getNumberOfAtoms();
+                atoms.multiply(numberOfAtoms);
+                break;
+            }
+            atoms.addAtomOccurrences(parseNextAtoms());
         }
         return atoms.getNumberOfAtoms();
     }
 
-    private Map<String, Integer> parse() {
+    private Map<String, Integer> parseNextAtoms() {
         StringBuilder atomNameBuilder = new StringBuilder();
         int atomNumber = 1;
 
@@ -50,8 +58,8 @@ class ParseMolecule {
                 if (Character.isDigit(ch3)) {
                     atomNumber = getNumberOfAtoms();
                 }
-                if (characterIsClosingParenthesis(formulaList.get(index))) {
-                    index++;
+                Character ch4 = formulaList.get(index);
+                if (characterIsClosingParenthesis(ch4)) {
                     return Map.of(atomNameBuilder.toString(), 1);
                 }
             }
@@ -97,6 +105,14 @@ class ParseMolecule {
         return !characterIsOpeningParenthesis(character);
     }
 
+    private boolean parenthesisIsClosing() {
+        if (formulaHasCharactersLeft()) {
+            Character character = formulaList.get(index);
+            return characterIsClosingParenthesis(character);
+        }
+        return false;
+    }
+
     private boolean parenthesisIsNotClosing() {
         if (formulaHasCharactersLeft()) {
             Character character = formulaList.get(index);
@@ -134,6 +150,13 @@ class NumberOfAtomsMap {
     public void addAtomOccurrences(Map<String, Integer> parsedAtoms) {
         for (String key : parsedAtoms.keySet()) {
             addAtomOccurrences(key, parsedAtoms.get(key));
+        }
+    }
+
+    public void multiply(int number) {
+        for (String key : this.numberOfAtoms.keySet()) {
+            Integer integer = this.numberOfAtoms.get(key);
+            this.numberOfAtoms.put(key, integer* number);
         }
     }
 }

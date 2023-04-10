@@ -12,12 +12,12 @@ class ParseMolecule {
     private final List<Character> formulaList;
     private Integer index = 0;
 
-    public ParseMolecule(String formula) {
-        this.formulaList = stringToCharacterList(formula);
-    }
-
     public static Map<String, Integer> getAtoms(String formula) {
         return new ParseMolecule(formula).parseMolecule();
+    }
+
+    private ParseMolecule(String formula) {
+        this.formulaList = stringToCharacterList(formula);
     }
 
     private Map<String, Integer> parseMolecule() {
@@ -63,7 +63,7 @@ class ParseMolecule {
                     }
                     Character ch4 = formulaList.get(index);
                     if (characterIsClosingParenthesis(ch4)) {
-                        return Map.of(atomNameBuilder.toString(), 1);
+                        return Map.of(atomNameBuilder.toString(), atomNumber);
                     }
                 }
                 String atomName = atomNameBuilder.toString();

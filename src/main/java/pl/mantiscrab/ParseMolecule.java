@@ -34,14 +34,15 @@ class ParseMolecule {
                 Map<String, Integer> map = parseMolecule();
                 atoms.addAtomsAmount(map);
             }
-            if (bracketIsClosing()) {
+            else if (bracketIsClosing()) {
                 closeBracket();
                 int numberOfAtoms = getNumberOfAtoms();
                 atoms.multiply(numberOfAtoms);
                 break;
+            } else {
+                Map<String, Integer> parsedAtoms = parseNext();
+                atoms.addAtomsAmount(parsedAtoms);
             }
-            Map<String, Integer> parsedAtoms = parseNext();
-            atoms.addAtomsAmount(parsedAtoms);
         }
         return atoms.getAtomsAmount();
     }

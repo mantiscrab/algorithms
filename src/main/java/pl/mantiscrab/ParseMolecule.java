@@ -1,15 +1,13 @@
 package pl.mantiscrab;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 class ParseMolecule {
 
     //new method starts from current index and increment in the end
     private final List<Character> formulaList;
     private Integer index = 0;
+    private final Stack<Character> openedParenthesis = new Stack<>();
 
     public static Map<String, Integer> getAtoms(String formula) {
         return new ParseMolecule(formula).parseMolecule();
@@ -23,12 +21,12 @@ class ParseMolecule {
         NumberOfAtomsMap atoms = new NumberOfAtomsMap();
         while (formulaHasCharactersLeft()) {
             if (parenthesisIsOpening()) {
-                index++;
+                openParenthesis();
                 Map<String, Integer> map = parseMolecule();
                 atoms.addAtomOccurrences(map);
             }
             if (parenthesisIsClosing()) {
-                index++;
+                closeParenthesis();
                 int numberOfAtoms = getNumberOfAtoms();
                 atoms.multiply(numberOfAtoms);
                 break;
@@ -37,6 +35,25 @@ class ParseMolecule {
             atoms.addAtomOccurrences(parsedAtoms);
         }
         return atoms.getNumberOfAtoms();
+    }
+
+    private void openParenthesis() {
+        openedParenthesis.push(formulaList.get(index));
+        index++;
+    }
+
+    private void closeParenthesis() {
+        Character closingParenthesis = formulaList.get(index);
+        Character opening = openedParenthesis.pop();
+        if(!openingParenthesisMatchesClosing(opening, closingParenthesis))
+            throw new IllegalArgumentException();
+        index++;
+    }
+
+    private boolean openingParenthesisMatchesClosing(Character opening, Character closingParenthesis) {
+        return opening.equals('(') && closingParenthesis.equals(')')
+                || opening.equals('[') && closingParenthesis.equals(']')
+                || opening.equals('{') && closingParenthesis.equals('}') ;
     }
 
     private Map<String, Integer> parseNextAtoms() {

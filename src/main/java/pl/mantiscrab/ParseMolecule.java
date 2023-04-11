@@ -73,6 +73,8 @@ class ParseMolecule {
     }
 
     private void closeBracket() {
+        if (openedBrackets.isEmpty())
+            throw new IllegalArgumentException();
         Character closingBracket = formulaList.get(index);
         Character openingBracket = openedBrackets.pop();
         if (!openingBracketMatchesClosing(openingBracket, closingBracket))

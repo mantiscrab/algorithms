@@ -18,12 +18,12 @@ class ParseMolecule {
     }
 
     private Map<String, Integer> parseMolecule() {
-        NumberOfAtomsMap atoms = new NumberOfAtomsMap();
+        AtomsAmount atoms = new AtomsAmount();
         while (formulaHasCharactersLeft()) {
             if (bracketIsOpening()) {
                 openBracket();
                 Map<String, Integer> map = parseMolecule();
-                atoms.addAtomOccurrences(map);
+                atoms.addAtomsAmount(map);
             }
             if (bracketIsClosing()) {
                 closeBracket();
@@ -32,9 +32,9 @@ class ParseMolecule {
                 break;
             }
             Map<String, Integer> parsedAtoms = parseNextAtoms();
-            atoms.addAtomOccurrences(parsedAtoms);
+            atoms.addAtomsAmount(parsedAtoms);
         }
-        return atoms.getNumberOfAtoms();
+        return atoms.getAtomsAmount();
     }
 
     private void openBracket() {
@@ -45,7 +45,7 @@ class ParseMolecule {
     private void closeBracket() {
         Character closingBracket = formulaList.get(index);
         Character openingBracket = openedBracket.pop();
-        if(!openingBracketMatchesClosing(openingBracket, closingBracket))
+        if (!openingBracketMatchesClosing(openingBracket, closingBracket))
             throw new IllegalArgumentException();
         index++;
     }
@@ -53,7 +53,7 @@ class ParseMolecule {
     private boolean openingBracketMatchesClosing(Character openingBracket, Character closingBracket) {
         return openingBracket.equals('(') && closingBracket.equals(')')
                 || openingBracket.equals('[') && closingBracket.equals(']')
-                || openingBracket.equals('{') && closingBracket.equals('}') ;
+                || openingBracket.equals('{') && closingBracket.equals('}');
     }
 
     private Map<String, Integer> parseNextAtoms() {
@@ -143,33 +143,28 @@ class ParseMolecule {
     }
 }
 
-class NumberOfAtomsMap {
-    Map<String, Integer> numberOfAtoms = new HashMap<>();
+class AtomsAmount {
+    Map<String, Integer> atomsAmount = new HashMap<>();
 
-    void addAtomOccurrences(String atom, Integer occurrencesNumber) {
-        Integer atomOccurrences = numberOfAtoms.getOrDefault(atom, 0);
-        numberOfAtoms.put(atom, atomOccurrences + occurrencesNumber);
+    void addAtomAmount(String atom, Integer amount) {
+        Integer atomAmount = atomsAmount.getOrDefault(atom, 0);
+        atomsAmount.put(atom, atomAmount + atomAmount);
     }
 
-    void addAtomOccurrences(String atom) {
-        Integer atomOccurrences = numberOfAtoms.getOrDefault(atom, 0);
-        numberOfAtoms.put(atom, atomOccurrences + 1);
+    Map<String, Integer> getAtomsAmount() {
+        return Collections.unmodifiableMap(atomsAmount);
     }
 
-    Map<String, Integer> getNumberOfAtoms() {
-        return Collections.unmodifiableMap(numberOfAtoms);
-    }
-
-    public void addAtomOccurrences(Map<String, Integer> parsedAtoms) {
+    void addAtomsAmount(Map<String, Integer> parsedAtoms) {
         for (String key : parsedAtoms.keySet()) {
-            addAtomOccurrences(key, parsedAtoms.get(key));
+            addAtomAmount(key, parsedAtoms.get(key));
         }
     }
 
-    public void multiply(int number) {
-        for (String key : this.numberOfAtoms.keySet()) {
-            Integer integer = this.numberOfAtoms.get(key);
-            this.numberOfAtoms.put(key, integer * number);
+    void multiply(int number) {
+        for (String key : this.atomsAmount.keySet()) {
+            Integer integer = this.atomsAmount.get(key);
+            this.atomsAmount.put(key, integer * number);
         }
     }
 }

@@ -8,7 +8,14 @@ class ParseMolecule {
     private final Stack<Character> openedBrackets = new Stack<>();
 
     public static Map<String, Integer> getAtoms(String formula) {
-        return new ParseMolecule(formula).parseMolecule();
+        return new ParseMolecule(formula).parse();
+    }
+
+    private Map<String, Integer> parse() {
+        Map<String, Integer> atoms = parseMolecule();
+        if (!openedBrackets.isEmpty())
+            throw new IllegalArgumentException();
+        return atoms;
     }
 
     private ParseMolecule(String formula) {
@@ -46,13 +53,9 @@ class ParseMolecule {
     private boolean bracketIsOpening() {
         if (areCharactersLeft()) {
             Character character = formulaList.get(index);
-            return characterIsOpeningBracket(character);
+            return character.equals('(') || character.equals('{') || character.equals('[');
         }
         return false;
-    }
-
-    private boolean characterIsOpeningBracket(Character character) {
-        return character.equals('(') || character.equals('{') || character.equals('[');
     }
 
     private void openBracket() {
@@ -63,13 +66,9 @@ class ParseMolecule {
     private boolean bracketIsClosing() {
         if (areCharactersLeft()) {
             Character character = formulaList.get(index);
-            return characterIsClosingBracket(character);
+            return character.equals(')') || character.equals('}') || character.equals(']');
         }
         return false;
-    }
-
-    private static boolean characterIsClosingBracket(Character character) {
-        return character.equals(')') || character.equals('}') || character.equals(']');
     }
 
     private void closeBracket() {

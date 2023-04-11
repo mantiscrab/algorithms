@@ -15,6 +15,10 @@ class ParseMolecule {
         this.formulaList = stringToCharacterList(formula);
     }
 
+    private List<Character> stringToCharacterList(String formula) {
+        return formula.chars().mapToObj(c -> (char) c).toList();
+    }
+
     private Map<String, Integer> parseMolecule() {
         AtomsAmount atoms = new AtomsAmount();
         while (areCharactersLeft()) {
@@ -35,9 +39,37 @@ class ParseMolecule {
         return atoms.getAtomsAmount();
     }
 
+    private boolean areCharactersLeft() {
+        return index < formulaList.size();
+    }
+
+    private boolean bracketIsOpening() {
+        if (areCharactersLeft()) {
+            Character character = formulaList.get(index);
+            return characterIsOpeningBracket(character);
+        }
+        return false;
+    }
+
+    private boolean characterIsOpeningBracket(Character character) {
+        return character.equals('(') || character.equals('{') || character.equals('[');
+    }
+
     private void openBracket() {
         openedBrackets.push(formulaList.get(index));
         index++;
+    }
+
+    private boolean bracketIsClosing() {
+        if (areCharactersLeft()) {
+            Character character = formulaList.get(index);
+            return characterIsClosingBracket(character);
+        }
+        return false;
+    }
+
+    private static boolean characterIsClosingBracket(Character character) {
+        return character.equals(')') || character.equals('}') || character.equals(']');
     }
 
     private void closeBracket() {
@@ -90,38 +122,6 @@ class ParseMolecule {
         }
         atomNumber = atomNumberBuilder.toString().equals("") ? 1 : Integer.parseInt(atomNumberBuilder.toString());
         return atomNumber;
-    }
-
-    private boolean bracketIsOpening() {
-        if (areCharactersLeft()) {
-            Character character = formulaList.get(index);
-            return characterIsOpeningBracket(character);
-        }
-        return false;
-    }
-
-    private static boolean characterIsClosingBracket(Character character) {
-        return character.equals(')') || character.equals('}') || character.equals(']');
-    }
-
-    private boolean characterIsOpeningBracket(Character character) {
-        return character.equals('(') || character.equals('{') || character.equals('[');
-    }
-
-    private boolean bracketIsClosing() {
-        if (areCharactersLeft()) {
-            Character character = formulaList.get(index);
-            return characterIsClosingBracket(character);
-        }
-        return false;
-    }
-
-    private List<Character> stringToCharacterList(String formula) {
-        return formula.chars().mapToObj(c -> (char) c).toList();
-    }
-
-    private boolean areCharactersLeft() {
-        return index < formulaList.size();
     }
 }
 

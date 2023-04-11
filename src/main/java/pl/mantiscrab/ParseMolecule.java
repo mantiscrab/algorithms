@@ -7,7 +7,7 @@ class ParseMolecule {
     //new method starts from current index and increment in the end
     private final List<Character> formulaList;
     private Integer index = 0;
-    private final Stack<Character> openedParenthesis = new Stack<>();
+    private final Stack<Character> openedBracket = new Stack<>();
 
     public static Map<String, Integer> getAtoms(String formula) {
         return new ParseMolecule(formula).parseMolecule();
@@ -20,13 +20,13 @@ class ParseMolecule {
     private Map<String, Integer> parseMolecule() {
         NumberOfAtomsMap atoms = new NumberOfAtomsMap();
         while (formulaHasCharactersLeft()) {
-            if (parenthesisIsOpening()) {
-                openParenthesis();
+            if (bracketIsOpening()) {
+                openBracket();
                 Map<String, Integer> map = parseMolecule();
                 atoms.addAtomOccurrences(map);
             }
-            if (parenthesisIsClosing()) {
-                closeParenthesis();
+            if (bracketIsClosing()) {
+                closeBracket();
                 int numberOfAtoms = getNumberOfAtoms();
                 atoms.multiply(numberOfAtoms);
                 break;
@@ -37,23 +37,23 @@ class ParseMolecule {
         return atoms.getNumberOfAtoms();
     }
 
-    private void openParenthesis() {
-        openedParenthesis.push(formulaList.get(index));
+    private void openBracket() {
+        openedBracket.push(formulaList.get(index));
         index++;
     }
 
-    private void closeParenthesis() {
-        Character closingParenthesis = formulaList.get(index);
-        Character opening = openedParenthesis.pop();
-        if(!openingParenthesisMatchesClosing(opening, closingParenthesis))
+    private void closeBracket() {
+        Character closingBracket = formulaList.get(index);
+        Character openingBracket = openedBracket.pop();
+        if(!openingBracketMatchesClosing(openingBracket, closingBracket))
             throw new IllegalArgumentException();
         index++;
     }
 
-    private boolean openingParenthesisMatchesClosing(Character opening, Character closingParenthesis) {
-        return opening.equals('(') && closingParenthesis.equals(')')
-                || opening.equals('[') && closingParenthesis.equals(']')
-                || opening.equals('{') && closingParenthesis.equals('}') ;
+    private boolean openingBracketMatchesClosing(Character openingBracket, Character closingBracket) {
+        return openingBracket.equals('(') && closingBracket.equals(')')
+                || openingBracket.equals('[') && closingBracket.equals(']')
+                || openingBracket.equals('{') && closingBracket.equals('}') ;
     }
 
     private Map<String, Integer> parseNextAtoms() {
@@ -94,42 +94,42 @@ class ParseMolecule {
         return atomNumber;
     }
 
-    private boolean parenthesisIsOpening() {
+    private boolean bracketIsOpening() {
         if (formulaHasCharactersLeft()) {
             Character character = formulaList.get(index);
-            return characterIsOpeningParenthesis(character);
+            return characterIsOpeningBracket(character);
         }
         return false;
     }
 
-    private static boolean characterIsClosingParenthesis(Character character) {
+    private static boolean characterIsClosingBracket(Character character) {
         return character.equals(')') || character.equals('}') || character.equals(']');
     }
 
-    private boolean characterIsOpeningParenthesis(Character character) {
+    private boolean characterIsOpeningBracket(Character character) {
         return character.equals('(') || character.equals('{') || character.equals('[');
     }
 
-    private static boolean characterIsNotClosingParenthesis(Character character) {
-        return !characterIsClosingParenthesis(character);
+    private static boolean characterIsNotClosingBracket(Character character) {
+        return !characterIsClosingBracket(character);
     }
 
-    private boolean characterIsNotOpeningParenthesis(Character character) {
-        return !characterIsOpeningParenthesis(character);
+    private boolean characterIsNotOpeningBracket(Character character) {
+        return !characterIsOpeningBracket(character);
     }
 
-    private boolean parenthesisIsClosing() {
+    private boolean bracketIsClosing() {
         if (formulaHasCharactersLeft()) {
             Character character = formulaList.get(index);
-            return characterIsClosingParenthesis(character);
+            return characterIsClosingBracket(character);
         }
         return false;
     }
 
-    private boolean parenthesisIsNotClosing() {
+    private boolean bracketIsNotClosing() {
         if (formulaHasCharactersLeft()) {
             Character character = formulaList.get(index);
-            return characterIsNotClosingParenthesis(character);
+            return characterIsNotClosingBracket(character);
         }
         return false;
     }

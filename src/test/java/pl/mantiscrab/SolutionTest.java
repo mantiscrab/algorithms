@@ -29,6 +29,16 @@ public class SolutionTest {
                         Arrays.asList(4, 14, 2, 4),
                         "K4[ON(SO3)2]2",
                         "Fremy's salt"},
+
+                {Arrays.asList("S", "H", "Co", "N", "O"),
+                        Arrays.asList(3, 42, 4, 12, 18),
+                        "{[Co(NH3)4(OH)2]3Co}(SO4)3",
+                        "hexol sulphate"},
+
+                {Arrays.asList("H", "O"),
+                        Arrays.asList(2, 1),
+                        "{((H)2)[O]}",
+                        "evilized water molecula"}
         });
     }
 

@@ -8,7 +8,6 @@ import java.util.Map;
 class ParseMolecule {
 
     //new method starts from current index and increment in the end
-    private final NumberOfAtomsMap atoms = new NumberOfAtomsMap();
     private final List<Character> formulaList;
     private Integer index = 0;
 
@@ -41,37 +40,29 @@ class ParseMolecule {
     }
 
     private Map<String, Integer> parseNextAtoms() {
+        String atomName = getAtomName();
+        int atomNumber = getNumberOfAtoms();
+        return atomName.equals("") ? Map.of() : Map.of(atomName, atomNumber);
+    }
+
+    private String getAtomName() {
         StringBuilder atomNameBuilder = new StringBuilder();
-        int atomNumber = 1;
-
         if (formulaHasCharactersLeft()) {
-
             final Character ch1 = formulaList.get(index);
-
             if (Character.isUpperCase(ch1)) {
                 atomNameBuilder.append(ch1);
                 index++;
-                if (formulaHasCharactersLeft()) {
-                    final char ch2 = formulaList.get(index);
-                    if (Character.isLowerCase(ch2)) {
-                        atomNameBuilder.append(formulaList.get(index));
-                        index++;
-                    }
-                    Character ch3 = formulaList.get(index);
-                    if (Character.isDigit(ch3)) {
-                        atomNumber = getNumberOfAtoms();
-                    }
-                    Character ch4 = formulaList.get(index);
-                    if (characterIsClosingParenthesis(ch4)) {
-                        return Map.of(atomNameBuilder.toString(), atomNumber);
-                    }
-                }
-                String atomName = atomNameBuilder.toString();
-                return Map.of(atomName, atomNumber);
-            }
-            throw new RuntimeException();
+            } else
+                throw new IllegalArgumentException();
         }
-        return Map.of();
+        if (formulaHasCharactersLeft()) {
+            final char ch2 = formulaList.get(index);
+            if (Character.isLowerCase(ch2)) {
+                atomNameBuilder.append(ch2);
+                index++;
+            }
+        }
+        return atomNameBuilder.toString();
     }
 
     private int getNumberOfAtoms() {
@@ -161,7 +152,7 @@ class NumberOfAtomsMap {
     public void multiply(int number) {
         for (String key : this.numberOfAtoms.keySet()) {
             Integer integer = this.numberOfAtoms.get(key);
-            this.numberOfAtoms.put(key, integer* number);
+            this.numberOfAtoms.put(key, integer * number);
         }
     }
 }

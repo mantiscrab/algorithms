@@ -3,11 +3,9 @@ package pl.mantiscrab;
 import java.util.*;
 
 class ParseMolecule {
-
-    //new method starts from current index and increment in the end
     private final List<Character> formulaList;
     private Integer index = 0;
-    private final Stack<Character> openedBracket = new Stack<>();
+    private final Stack<Character> openedBrackets = new Stack<>();
 
     public static Map<String, Integer> getAtoms(String formula) {
         return new ParseMolecule(formula).parseMolecule();
@@ -19,7 +17,7 @@ class ParseMolecule {
 
     private Map<String, Integer> parseMolecule() {
         AtomsAmount atoms = new AtomsAmount();
-        while (formulaHasCharactersLeft()) {
+        while (areCharactersLeft()) {
             if (bracketIsOpening()) {
                 openBracket();
                 Map<String, Integer> map = parseMolecule();
@@ -31,20 +29,20 @@ class ParseMolecule {
                 atoms.multiply(numberOfAtoms);
                 break;
             }
-            Map<String, Integer> parsedAtoms = parseNextAtoms();
+            Map<String, Integer> parsedAtoms = parseNext();
             atoms.addAtomsAmount(parsedAtoms);
         }
         return atoms.getAtomsAmount();
     }
 
     private void openBracket() {
-        openedBracket.push(formulaList.get(index));
+        openedBrackets.push(formulaList.get(index));
         index++;
     }
 
     private void closeBracket() {
         Character closingBracket = formulaList.get(index);
-        Character openingBracket = openedBracket.pop();
+        Character openingBracket = openedBrackets.pop();
         if (!openingBracketMatchesClosing(openingBracket, closingBracket))
             throw new IllegalArgumentException();
         index++;
@@ -56,7 +54,7 @@ class ParseMolecule {
                 || openingBracket.equals('{') && closingBracket.equals('}');
     }
 
-    private Map<String, Integer> parseNextAtoms() {
+    private Map<String, Integer> parseNext() {
         String atomName = getAtomName();
         int atomNumber = getNumberOfAtoms();
         return atomName.equals("") ? Map.of() : Map.of(atomName, atomNumber);
@@ -64,7 +62,7 @@ class ParseMolecule {
 
     private String getAtomName() {
         StringBuilder atomNameBuilder = new StringBuilder();
-        if (formulaHasCharactersLeft()) {
+        if (areCharactersLeft()) {
             final Character ch1 = formulaList.get(index);
             if (Character.isUpperCase(ch1)) {
                 atomNameBuilder.append(ch1);
@@ -72,7 +70,7 @@ class ParseMolecule {
             } else
                 throw new IllegalArgumentException();
         }
-        if (formulaHasCharactersLeft()) {
+        if (areCharactersLeft()) {
             final char ch2 = formulaList.get(index);
             if (Character.isLowerCase(ch2)) {
                 atomNameBuilder.append(ch2);
@@ -85,7 +83,7 @@ class ParseMolecule {
     private int getNumberOfAtoms() {
         StringBuilder atomNumberBuilder = new StringBuilder();
         final int atomNumber;
-        while (formulaHasCharactersLeft()
+        while (areCharactersLeft()
                 && Character.isDigit(formulaList.get(index))) {
             atomNumberBuilder.append(formulaList.get(index));
             index++;
@@ -95,7 +93,7 @@ class ParseMolecule {
     }
 
     private boolean bracketIsOpening() {
-        if (formulaHasCharactersLeft()) {
+        if (areCharactersLeft()) {
             Character character = formulaList.get(index);
             return characterIsOpeningBracket(character);
         }
@@ -110,26 +108,10 @@ class ParseMolecule {
         return character.equals('(') || character.equals('{') || character.equals('[');
     }
 
-    private static boolean characterIsNotClosingBracket(Character character) {
-        return !characterIsClosingBracket(character);
-    }
-
-    private boolean characterIsNotOpeningBracket(Character character) {
-        return !characterIsOpeningBracket(character);
-    }
-
     private boolean bracketIsClosing() {
-        if (formulaHasCharactersLeft()) {
+        if (areCharactersLeft()) {
             Character character = formulaList.get(index);
             return characterIsClosingBracket(character);
-        }
-        return false;
-    }
-
-    private boolean bracketIsNotClosing() {
-        if (formulaHasCharactersLeft()) {
-            Character character = formulaList.get(index);
-            return characterIsNotClosingBracket(character);
         }
         return false;
     }
@@ -138,7 +120,7 @@ class ParseMolecule {
         return formula.chars().mapToObj(c -> (char) c).toList();
     }
 
-    private boolean formulaHasCharactersLeft() {
+    private boolean areCharactersLeft() {
         return index < formulaList.size();
     }
 }
@@ -148,7 +130,7 @@ class AtomsAmount {
 
     void addAtomAmount(String atom, Integer amount) {
         Integer atomAmount = atomsAmount.getOrDefault(atom, 0);
-        atomsAmount.put(atom, atomAmount + atomAmount);
+        atomsAmount.put(atom, amount + atomAmount);
     }
 
     Map<String, Integer> getAtomsAmount() {

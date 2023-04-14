@@ -19,11 +19,7 @@ class ParseMolecule {
     }
 
     private ParseMolecule(String formula) {
-        this.formulaList = stringToCharacterList(formula);
-    }
-
-    private List<Character> stringToCharacterList(String formula) {
-        return formula.chars().mapToObj(c -> (char) c).toList();
+        this.formulaList = formula.chars().mapToObj(c -> (char) c).toList();
     }
 
     private Map<String, Integer> parseMolecule() {
@@ -33,8 +29,7 @@ class ParseMolecule {
                 openBracket();
                 Map<String, Integer> map = parseMolecule();
                 atoms.addAtomsAmount(map);
-            }
-            else if (bracketIsClosing()) {
+            } else if (bracketIsClosing()) {
                 closeBracket();
                 int numberOfAtoms = getNumberOfAtoms();
                 atoms.multiply(numberOfAtoms);
@@ -52,11 +47,8 @@ class ParseMolecule {
     }
 
     private boolean bracketIsOpening() {
-        if (areCharactersLeft()) {
-            Character character = formulaList.get(index);
-            return character.equals('(') || character.equals('{') || character.equals('[');
-        }
-        return false;
+        Character character = formulaList.get(index);
+        return character.equals('(') || character.equals('{') || character.equals('[');
     }
 
     private void openBracket() {
@@ -65,11 +57,8 @@ class ParseMolecule {
     }
 
     private boolean bracketIsClosing() {
-        if (areCharactersLeft()) {
-            Character character = formulaList.get(index);
-            return character.equals(')') || character.equals('}') || character.equals(']');
-        }
-        return false;
+        Character character = formulaList.get(index);
+        return character.equals(')') || character.equals('}') || character.equals(']');
     }
 
     private void closeBracket() {
@@ -89,6 +78,8 @@ class ParseMolecule {
     }
 
     private Map<String, Integer> parseNext() {
+        if (!areCharactersLeft())
+            throw new IllegalArgumentException();
         String atomName = getAtomName();
         int atomNumber = getNumberOfAtoms();
         return atomName.equals("") ? Map.of() : Map.of(atomName, atomNumber);
@@ -96,14 +87,12 @@ class ParseMolecule {
 
     private String getAtomName() {
         StringBuilder atomNameBuilder = new StringBuilder();
-        if (areCharactersLeft()) {
-            final Character ch1 = formulaList.get(index);
-            if (Character.isUpperCase(ch1)) {
-                atomNameBuilder.append(ch1);
-                index++;
-            } else
-                throw new IllegalArgumentException();
-        }
+        final Character ch1 = formulaList.get(index);
+        if (Character.isUpperCase(ch1)) {
+            atomNameBuilder.append(ch1);
+            index++;
+        } else
+            throw new IllegalArgumentException();
         if (areCharactersLeft()) {
             final char ch2 = formulaList.get(index);
             if (Character.isLowerCase(ch2)) {

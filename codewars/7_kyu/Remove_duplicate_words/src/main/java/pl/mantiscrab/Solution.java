@@ -1,10 +1,10 @@
 package pl.mantiscrab;
 
 import java.util.Arrays;
-import java.util.LinkedHashSet;
+import java.util.stream.Collectors;
 
 class Solution {
     public static String removeDuplicateWords(String s) {
-        return new LinkedHashSet<>(Arrays.asList(s.split(" "))).stream().reduce((s1, s2) -> s1 + " " + s2).orElseThrow();
+        return Arrays.stream(s.split(" ")).distinct().collect(Collectors.joining(" "));
     }
 }

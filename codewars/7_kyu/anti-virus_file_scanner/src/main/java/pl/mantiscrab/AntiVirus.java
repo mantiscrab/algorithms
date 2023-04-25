@@ -7,6 +7,7 @@ public class AntiVirus {
 
     public static final String IS_NOT_SAFE = "is not safe";
     public static final String IS_SAFE = "is safe";
+
     private int scanIntensity = 0;
 
     //this method is ready for you.
@@ -16,19 +17,12 @@ public class AntiVirus {
 
     //write this method.
     public String scanFile(File file, VirusDB database) {
-        if (scanIntensity == 0)
-            return file.getName() + " " + IS_SAFE;
-        final String[] signatures = getSignaturesUpToDefinedIntensity(database, scanIntensity);
-        final String regEx = ".*(%s).*".formatted(String.join("|", signatures));
-        final String s = file.getData().toLowerCase().matches(regEx.toLowerCase()) ? IS_NOT_SAFE : IS_SAFE;
-        return file.getName() + " " + s;
-    }
-
-    private String[] getSignaturesUpToDefinedIntensity(final VirusDB database, final int scanIntensity) {
-        return IntStream.range(0, scanIntensity + 1)
+        final String safeOrNot = IntStream.range(0, scanIntensity + 1)
                 .mapToObj(database::getSignatures)
                 .flatMap(Arrays::stream)
-                .toArray(String[]::new);
+                .anyMatch(signature -> file.getData().toLowerCase().contains(signature.toLowerCase()))
+                ? IS_NOT_SAFE : IS_SAFE;
+        return file.getName() + " " + safeOrNot;
     }
 }
 

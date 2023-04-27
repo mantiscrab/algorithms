@@ -7,6 +7,7 @@ public class Kata {
                 && result.contains(")")
                 && result.indexOf("(") < result.lastIndexOf(")")) {
             result = result.replaceAll("\\([^()]*?\\)", "");
+
         }
         return result;
     }
